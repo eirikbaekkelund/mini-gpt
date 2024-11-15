@@ -38,10 +38,10 @@ def doc_to_text(client: WeaviateClient, doc_id: int) -> str:
 
 def write_to_txt(file: str="analytics"):
     client_params = dict(
-        host = '10.10.51.14',
-        port = 8050,
-        grpc_host = '10.10.51.14',
-        grpc_port = 50054,
+        host = os.getenv('HOST'),
+        port = os.getnenv('PORT'),
+        grpc_host = os.getenv('GRPC_HOST'),
+        grpc_port = os.getenv('GRPC_PORT'),
     )
 
     client = WeaviateClient(**client_params)
