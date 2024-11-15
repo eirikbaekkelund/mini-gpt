@@ -1,0 +1,8 @@
+tiktoken==0.8.0
+numpy==1.26.4 # 2.n.n is just bleh
+pandas==2.2.3
+weaviate-client
+pydantic==2.9.2
+ipykernel==6.29.5
+# can remove if no cuda or change for cuda <12.4 
+torch #--index-url https://download.pytorch.org/whl/cu124 
