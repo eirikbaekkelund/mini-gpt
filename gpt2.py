@@ -83,13 +83,13 @@ class CasualSelfAttention(nn.Module):
         
         return x
     
-    def transform_attn(self, x: torch.Tensor, batch_size: int, seq_len: int, n_embed: int) -> torch.Tensor:
+    def _transform_attn(self, x: torch.Tensor, batch_size: int, seq_len: int, n_embed: int) -> torch.Tensor:
         return x.view(batch_size, seq_len, self.num_heads, n_embed // self.num_heads).transpose(1, 2)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         batch_size, seq_len, n_embed = x.size()
         q, k, v = self.qkv(x).split(self.embedding_dim, dim=2)
-        q, k, v = map(lambda t: self.transform_attn(t, batch_size, seq_len, n_embed), (q, k, v))
+        q, k, v = map(lambda t: self._transform_attn(t, batch_size, seq_len, n_embed), (q, k, v))
 
         x = self._attention_mechanism(q, k, v, seq_len)
         x = x.transpose(1, 2).contiguous().view(batch_size, seq_len, n_embed)
@@ -101,7 +101,7 @@ class CasualSelfAttention(nn.Module):
 class GPTBlock(nn.Module):
     def __init__(self, config: GPTConfig):
         super(GPTBlock, self).__init__()
-        self.ln1 = LayerNorm(config.embedding_dim, bias=config.bias)
+        self.ln1 = LayerNorm(config.embedding_dim, bias=config.bias) 
         self.ln2 = LayerNorm(config.embedding_dim, bias=config.bias)
         self.attn = CasualSelfAttention(config)
         self.mlp = MLP(config)
@@ -165,7 +165,7 @@ class GPT(nn.Module):
         word_embd = self.transformer.word_embd(x)
         pos_embd = self.transformer.pos_embd(torch.arange(x.size(1), device=x.device))
         x = self.transformer.drop(word_embd + pos_embd)
-        
+
         for block in self.transformer.blocks:
             x = block(x)
         
@@ -218,6 +218,6 @@ class GPT(nn.Module):
         for _ in range(max_length):
             next_token = self._predict_next_token(x, temperature, top_k)
             x = torch.cat((x, next_token), dim=-1) 
-            yield x  
+            # only yield the last token
+            yield x[:, -1:]
 
-            
