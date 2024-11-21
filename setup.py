@@ -1,7 +1,7 @@
 import os
 import tiktoken
 import numpy as np
-from weaviate_client.client import WeaviateClient
+from client import WeaviateClient
 from typing import Tuple
 
 def get_train_val_data(split: float=0.95) -> Tuple[str, str]:
